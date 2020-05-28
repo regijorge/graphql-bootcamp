@@ -19,12 +19,14 @@ const posts = [
     {
         id: 1,
         title: 'Udemy cource',
-        body: 'Learn something cool'
+        body: 'Learn something cool',
+        author: 2
     },
     {
         id: 2,
         title: 'Graphql 101',
-        body: 'Learn how GraphQL works, this is beautifull!'
+        body: 'Learn how GraphQL works, this is beautifull!',
+        author: 2
     }
 ]
 
@@ -45,6 +47,7 @@ const typeDefs = `
         name: String!
         email: String!
         age: Int!
+        posts: [Post!]!
     }
 
     type Post {
@@ -52,6 +55,7 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
     }
 `
 
@@ -112,6 +116,20 @@ const resolvers = {
                 const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
 
                 return isTitleMatch || isBodyMatch
+            })
+        }
+    },
+    Post: {
+        author(parent, args, ctx, info) {
+            return users.find((user) => {
+                return user.id === parent.author
+            })
+        }
+    },
+    User: {
+        posts(parent, args, ctx, info) {
+            return posts.filter((post) => {
+                return post.author === parent.id
             })
         }
     }
