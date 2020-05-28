@@ -1,34 +1,42 @@
 import { GraphQLServer } from 'graphql-yoga'
 
 // Demo data
-const users = [
-    {
-        id: 1,
-        name: 'Regi',
-        email: 'regi@domain.com',
-        age: 27
-    },
-    {
-        id: 2,
-        name: 'Jorge',
-        email: 'jorge@domain.com',
-    }
-]
+const users = [{
+    id: 1,
+    name: 'Regi',
+    email: 'regi@domain.com',
+    age: 27
+}, {
+    id: 2,
+    name: 'Jorge',
+    email: 'jorge@domain.com',
+}]
 
-const posts = [
-    {
-        id: 1,
-        title: 'Udemy cource',
-        body: 'Learn something cool',
-        author: 2
-    },
-    {
-        id: 2,
-        title: 'Graphql 101',
-        body: 'Learn how GraphQL works, this is beautifull!',
-        author: 2
-    }
-]
+const posts = [    {
+    id: 1,
+    title: 'Udemy cource',
+    body: 'Learn something cool',
+    author: 2
+}, {
+    id: 2,
+    title: 'Graphql 101',
+    body: 'Learn how GraphQL works, this is beautifull!',
+    author: 2
+}]
+
+const comments = [{
+    id: 'c1',
+    text: 'Awesome GraphQL course!',
+    author: 1
+}, {
+    id: 'c2',
+    text: 'My comment is here',
+    author: 1
+}, {
+    id: 'c3',
+    text: 'Something nice is happening right now!',
+    author: 2
+}]
 
 // Type definitins (schema)
 const typeDefs = `
@@ -40,6 +48,7 @@ const typeDefs = `
         post: Post
         users(query: String): [User!]!
         posts(query: String): [Post!]!
+        comments: [Comment!]!
     }
 
     type User {
@@ -48,6 +57,7 @@ const typeDefs = `
         email: String!
         age: Int!
         posts: [Post!]!
+        comments: [Comment!]!
     }
 
     type Post {
@@ -55,6 +65,12 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
+    }
+
+    type Comment {
+        id: ID!
+        text: String!
         author: User!
     }
 `
@@ -117,6 +133,9 @@ const resolvers = {
 
                 return isTitleMatch || isBodyMatch
             })
+        },
+        comments(parent, args, ctx, info) {
+            return comments
         }
     },
     Post: {
@@ -130,6 +149,18 @@ const resolvers = {
         posts(parent, args, ctx, info) {
             return posts.filter((post) => {
                 return post.author === parent.id
+            })
+        },
+        comments(parent, args, gtx, info) {
+            return comments.filter((comment) => {
+                return comment.author === parent.id
+            })
+        }
+    },
+    Comment: {
+        author(parent, args, gtx, info) {
+            return users.find((user) => {
+                return user.id === parent.author
             })
         }
     }
