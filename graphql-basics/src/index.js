@@ -1,5 +1,33 @@
 import { GraphQLServer } from 'graphql-yoga'
 
+// Demo data
+const users = [
+    {
+        id: 1,
+        name: 'Regi',
+        email: 'regi@domain.com',
+        age: 27
+    },
+    {
+        id: 2,
+        name: 'Jorge',
+        email: 'jorge@domain.com',
+    }
+]
+
+const posts = [
+    {
+        id: 1,
+        title: 'Udemy cource',
+        body: 'Learn something cool'
+    },
+    {
+        id: 2,
+        title: 'Graphql 101',
+        body: 'Learn how GraphQL works, this is beautifull!'
+    }
+]
+
 // Type definitins (schema)
 const typeDefs = `
     type Query {
@@ -8,6 +36,8 @@ const typeDefs = `
         grades: [Int!]!
         me: User
         post: Post
+        users(query: String): [User!]!
+        posts(query: String): [Post!]!
     }
 
     type User {
@@ -62,6 +92,27 @@ const resolvers = {
                 body: 'My blog post content',
                 published: true
             }
+        },
+        users(parent, args, ctx, info) {
+            if (!args.query) {
+                return users
+            }
+
+            return users.filter((user) => {
+                return user.name.toLowerCase().includes(args.query.toLowerCase())
+            })
+        },
+        posts(parent, args, ctx, info) {
+            if (!args.query) {
+                return posts
+            }
+
+            return posts.filter((post) => {
+                const isTitleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
+                const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
+
+                return isTitleMatch || isBodyMatch
+            })
         }
     }
 }
