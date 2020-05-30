@@ -37,7 +37,7 @@ const comments = [{
 }]
 
 const db = {
-  user,
+  users,
   posts,
   comments
 }
